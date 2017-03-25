@@ -48,7 +48,9 @@ class DispatchCommand extends Command
             if (false === $riddimName = $this->getRiddimName($file)) {
                 continue;
             }
+
             $destDir = $input->getArgument('output') . DIRECTORY_SEPARATOR . 'VA-'.$riddimName.'-'.date('Y');
+            $destDir = $input->getArgument('output') . DIRECTORY_SEPARATOR . 'VA-'.$riddimName.'-2015';
             $destFile = $destDir . DIRECTORY_SEPARATOR . $file->getFilename();
 
             if ($file->getPathname() == $destFile) {
@@ -60,8 +62,10 @@ class DispatchCommand extends Command
             try {
                 $fs->rename($file->getPathname(), $destFile);
                 $output->writeln('<info>['.$riddimName.']</info> '.$file->getFilename().' >> <comment>'.$destDir.'</comment>');
-                if (Finder::create()->in($file->getPath())->files()->count() == 0) {
+                if ($input->getArgument('output') != $file->getPath() && Finder::create()->in($file->getPath())->files()->count() == 0) {
+                    $fs = new Filesystem();
                     $output->writeln(sprintf('%s must be cleaned because is empty now', $file->getPath()));
+                    $fs->remove($file->getPath());
                 }
             } catch (IOException $e) {
                 $output->writeln($e->getMessage());
