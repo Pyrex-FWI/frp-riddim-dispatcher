@@ -1,0 +1,23 @@
+{
+  "name": "pyrex-fwi/frp-dancehall-dispatch",
+  "description": "Group song with same riddim name into one dir",
+  "minimum-stability": "dev",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "Pyrex-Fwi",
+      "email": "email@example.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "FrpRiddimDispatcher\\" : "src/"
+    }
+  },
+  "require": {
+    "symfony/filesystem": "3.2.*",
+    "symfony/console": "3.2.*",
+    "symfony/var-dumper": "3.2.*",
+    "symfony/finder": "3.2.*"
+  }
+}
