@@ -5,12 +5,14 @@ namespace FrpRiddimDispatcher\Command;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Filesystem\Exception\FileNotFoundException;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
+use Symfony\Component\VarDumper\VarDumper;
 
 /**
  * Class DispatchCommand
@@ -23,18 +25,26 @@ class DispatchCommand extends Command
         $this->setName('frp:riddim:dispatcher');
         $this->addArgument('input', InputArgument::REQUIRED);
         $this->addArgument('output', InputArgument::OPTIONAL);
+        $this->addOption('year', 'y', InputOption::VALUE_OPTIONAL, 'year dir ==> \d{4}', date('Y'));
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output)
     {
         parent::initialize($input, $output);
+        
         $fs = new Filesystem();
          if (!$fs->exists($input->getArgument('input'))) {
              throw new FileNotFoundException(sprintf('Input %s, directory not exist', $input->getArgument('input')));
          }
+
+         if (1 > preg_match('/\d{4}/', $input->getOption('year'))) {
+             throw new FileNotFoundException(sprintf('Date %s, is not correct value', $input->getOption('year')));
+        }
+
         if (!$input->getArgument('output')) {
             $input->setArgument('output', $input->getArgument('input'));
         }
+
         if (!$fs->exists($input->getArgument('output'))) {
             throw new FileNotFoundException(sprintf('Output %s, directory not exist', $input->getArgument('output')));
         }
@@ -49,8 +59,7 @@ class DispatchCommand extends Command
                 continue;
             }
 
-            $destDir = $input->getArgument('output') . DIRECTORY_SEPARATOR . 'VA-'.$riddimName.'-'.date('Y');
-            $destDir = $input->getArgument('output') . DIRECTORY_SEPARATOR . 'VA-'.$riddimName.'-2015';
+            $destDir = $input->getArgument('output') . DIRECTORY_SEPARATOR . 'VA-'.$riddimName.'-'.$input->getOption('year');
             $destFile = $destDir . DIRECTORY_SEPARATOR . $file->getFilename();
 
             if ($file->getPathname() == $destFile) {
